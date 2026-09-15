@@ -1,5 +1,5 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WORKKIT — 仕事を前に進める無料ツール</title><meta name="description" content="営業・マネジメント・AI活用を中心に、仕事の判断を速くする実用無料ツール。"><style>
+<title>再コール優先順位診断 | WORKKIT</title><style>
 :root{
   --bg:#07101d;--panel:#0d1726;--panel2:#111d2e;--line:rgba(255,255,255,.09);
   --text:#f7f9fc;--muted:#98a5b7;--soft:#c7d0db;--accent:#fff;
@@ -75,37 +75,41 @@ textarea{min-height:120px;resize:vertical}
 @media(max-width:900px){.grid{grid-template-columns:1fr 1fr}.tool-layout{grid-template-columns:1fr}.row4{grid-template-columns:1fr 1fr}}
 @media(max-width:620px){.grid{grid-template-columns:1fr}.row,.row4{grid-template-columns:1fr}.nav{display:none}.hero{padding-top:45px}}
 </style></head>
-<body data-bet="home">
+<body data-bet="004">
 <div class="shell">
 <header>
 <a class="brand" href="index.html"><span class="logo"></span><span>WORKKIT</span></a>
 <nav class="nav"><a href="index.html#live">無料ツール</a><a href="index.html#soon">Coming soon</a></nav>
 </header>
 
-<section class="hero">
-<span class="tag">FREE TOOLS FOR BETTER WORK</span>
-<h1>仕事を、<br>もっと前へ。</h1>
-<p>数字を入れる。結果が返る。次に何をすべきかまで分かる。営業・マネジメントの実務で使える無料ツールを、少しずつ増やしています。</p>
-</section>
-<section class="section" id="live">
-<div class="section-head"><div><span class="eyebrow">LIVE NOW</span><h2>今すぐ使える</h2></div><div class="small">登録不要 / 無料</div></div>
-<div class="grid">
-<a class="card" href="kpi-diagnosis.html"><span class="pill">営業・KPI</span><h3>営業KPIボトルネック診断</h3><p>架電→接続→有効会話→アポを分解。弱い箇所と明日の改善アクションを返します。</p><div class="meta">約30秒 →</div></a>
-<a class="card" href="call-feedback.html"><span class="pill">通話・品質</span><h3>通話ログフィードバック</h3><p>文字起こしを貼るだけ。質問量・次アクション・ヒアリングの弱点をルール診断します。</p><div class="meta">約1分 →</div></a>
-<a class="card" href="script-builder.html"><span class="pill">営業トーク</span><h3>営業スクリプト設計</h3><p>商材・顧客・価値を入れると、導入からクロージングまでの骨子を生成します。</p><div class="meta">約1分 →</div></a>
-<a class="card" href="recall-priority.html"><span class="pill">再コール</span><h3>再コール優先順位診断</h3><p>見込み度・最終接触日・約束有無から、今日かける順番をスコアリングします。</p><div class="meta">約1分 →</div></a>
-<a class="card" href="forecast-gap.html"><span class="pill">予実管理</span><h3>営業予実ギャップ診断</h3><p>目標・現在地・経過日数から月末着地と必要ペースを逆算します。</p><div class="meta">約30秒 →</div></a>
+<section class="tool-hero"><span class="pill">再コール</span><h1>再コール優先順位診断</h1>
+<p class="small">1行1件で入力。見込み度・経過日数・再コール約束を加味して、今日かける順番を並べます。</p></section>
+<div class="tool-layout">
+<div class="panel"><h2>案件を入力</h2>
+<div class="field"><label>形式：案件名, 見込み度1-5, 最終接触からの日数, 約束あり0/1</label>
+<textarea id="txt">A社,5,1,1
+B社,3,7,0
+C社,4,3,0
+D社,2,14,1</textarea></div>
+<button class="btn" id="run">優先順位を出す</button>
+<p class="small">スコア = 見込み度×12 + 約束あり25 + 経過日数補正（最大20）</p></div>
+<div class="panel result" id="result"><span class="eyebrow">TODAY'S PRIORITY</span><div id="table"></div></div>
 </div>
-</section>
-<section class="section" id="soon">
-<div class="section-head"><div><span class="eyebrow">COMING SOON</span><h2>次に追加予定</h2></div></div>
-<div class="grid">
-<div class="card"><span class="pill">AI</span><h3>営業録音AI分析</h3><p>文字起こしから、ヒアリング・切り返し・クロージングを詳細分析。</p></div>
-<div class="card"><span class="pill">1on1</span><h3>営業1on1コーチ</h3><p>KPIから質問・課題・次回確認ポイントを生成。</p></div>
-<div class="card"><span class="pill">研修</span><h3>新人営業研修ビルダー</h3><p>役割・商材・日数から研修計画を作成。</p></div>
-</div>
-</section>
-
+<script>
+document.getElementById('run').onclick=()=>{
+ if(window.BETS_TRACK) window.BETS_TRACK('tool_start',{label:'recall_priority'});
+ const rows=txt.value.split(/\n/).map(x=>x.trim()).filter(Boolean).map(line=>{
+  const [name,interest,days,promise]=line.split(',').map(x=>x.trim());
+  const i=Math.max(1,Math.min(5,+interest||1)),d=Math.max(0,+days||0),p=+promise?1:0;
+  const score=i*12+p*25+Math.min(20,d*2);
+  return {name,interest:i,days:d,promise:p,score};
+ }).sort((a,b)=>b.score-a.score);
+ table.innerHTML='<table class="table"><tr><th>順位</th><th>案件</th><th>Score</th><th>理由</th></tr>'+
+ rows.map((r,i)=>`<tr><td>${i+1}</td><td>${r.name}</td><td><b>${r.score}</b></td><td>${r.promise?'再コール約束あり / ':''}見込み${r.interest} / ${r.days}日経過</td></tr>`).join('')+'</table>';
+ result.classList.add('show');
+ if(window.BETS_TRACK) window.BETS_TRACK('result_view',{label:'priority_generated'});
+}
+</script>
 <footer><div>WORKKIT — practical tools for better work.</div></footer>
 </div>
 <script src="tracking.js"></script></body></html>

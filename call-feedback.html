@@ -1,5 +1,5 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WORKKIT — 仕事を前に進める無料ツール</title><meta name="description" content="営業・マネジメント・AI活用を中心に、仕事の判断を速くする実用無料ツール。"><style>
+<title>通話ログフィードバック | WORKKIT</title><style>
 :root{
   --bg:#07101d;--panel:#0d1726;--panel2:#111d2e;--line:rgba(255,255,255,.09);
   --text:#f7f9fc;--muted:#98a5b7;--soft:#c7d0db;--accent:#fff;
@@ -75,37 +75,56 @@ textarea{min-height:120px;resize:vertical}
 @media(max-width:900px){.grid{grid-template-columns:1fr 1fr}.tool-layout{grid-template-columns:1fr}.row4{grid-template-columns:1fr 1fr}}
 @media(max-width:620px){.grid{grid-template-columns:1fr}.row,.row4{grid-template-columns:1fr}.nav{display:none}.hero{padding-top:45px}}
 </style></head>
-<body data-bet="home">
+<body data-bet="002">
 <div class="shell">
 <header>
 <a class="brand" href="index.html"><span class="logo"></span><span>WORKKIT</span></a>
 <nav class="nav"><a href="index.html#live">無料ツール</a><a href="index.html#soon">Coming soon</a></nav>
 </header>
 
-<section class="hero">
-<span class="tag">FREE TOOLS FOR BETTER WORK</span>
-<h1>仕事を、<br>もっと前へ。</h1>
-<p>数字を入れる。結果が返る。次に何をすべきかまで分かる。営業・マネジメントの実務で使える無料ツールを、少しずつ増やしています。</p>
-</section>
-<section class="section" id="live">
-<div class="section-head"><div><span class="eyebrow">LIVE NOW</span><h2>今すぐ使える</h2></div><div class="small">登録不要 / 無料</div></div>
-<div class="grid">
-<a class="card" href="kpi-diagnosis.html"><span class="pill">営業・KPI</span><h3>営業KPIボトルネック診断</h3><p>架電→接続→有効会話→アポを分解。弱い箇所と明日の改善アクションを返します。</p><div class="meta">約30秒 →</div></a>
-<a class="card" href="call-feedback.html"><span class="pill">通話・品質</span><h3>通話ログフィードバック</h3><p>文字起こしを貼るだけ。質問量・次アクション・ヒアリングの弱点をルール診断します。</p><div class="meta">約1分 →</div></a>
-<a class="card" href="script-builder.html"><span class="pill">営業トーク</span><h3>営業スクリプト設計</h3><p>商材・顧客・価値を入れると、導入からクロージングまでの骨子を生成します。</p><div class="meta">約1分 →</div></a>
-<a class="card" href="recall-priority.html"><span class="pill">再コール</span><h3>再コール優先順位診断</h3><p>見込み度・最終接触日・約束有無から、今日かける順番をスコアリングします。</p><div class="meta">約1分 →</div></a>
-<a class="card" href="forecast-gap.html"><span class="pill">予実管理</span><h3>営業予実ギャップ診断</h3><p>目標・現在地・経過日数から月末着地と必要ペースを逆算します。</p><div class="meta">約30秒 →</div></a>
-</div>
-</section>
-<section class="section" id="soon">
-<div class="section-head"><div><span class="eyebrow">COMING SOON</span><h2>次に追加予定</h2></div></div>
-<div class="grid">
-<div class="card"><span class="pill">AI</span><h3>営業録音AI分析</h3><p>文字起こしから、ヒアリング・切り返し・クロージングを詳細分析。</p></div>
-<div class="card"><span class="pill">1on1</span><h3>営業1on1コーチ</h3><p>KPIから質問・課題・次回確認ポイントを生成。</p></div>
-<div class="card"><span class="pill">研修</span><h3>新人営業研修ビルダー</h3><p>役割・商材・日数から研修計画を作成。</p></div>
-</div>
-</section>
-
+<section class="tool-hero"><span class="pill">通話・品質</span><h1>通話ログフィードバック</h1>
+<p class="small">AI APIは使わず、ブラウザ内のルール診断で「質問・課題把握・価値提示・次アクション」をチェックします。</p></section>
+<div class="tool-layout">
+<div class="panel"><h2>文字起こしを貼る</h2>
+<div class="field"><label>通話ログ</label><textarea id="txt" placeholder="例：営業：現在はどのサービスをお使いですか？&#10;顧客：○○です。&#10;営業：ありがとうございます。今お困りの点はありますか？"></textarea></div>
+<button class="btn" id="run">フィードバックする</button></div>
+<div class="panel result" id="result"><span class="eyebrow">RESULT</span><div class="score"><span id="score"></span><span style="font-size:18px"> / 100</span></div>
+<div class="kpi" id="metrics"></div>
+<div class="callout"><strong>改善ポイント</strong><div id="advice"></div></div>
+<div class="actions"><strong>次のロープレ課題</strong><ol id="tasks"></ol></div>
+</div></div>
+<script>
+document.getElementById('run').onclick=()=>{
+ const t=txt.value.trim();
+ if(!t){alert('通話ログを貼ってください');return}
+ if(window.BETS_TRACK) window.BETS_TRACK('tool_start',{label:'call_feedback'});
+ const q=(t.match(/[?？]/g)||[]).length;
+ const need=(t.match(/困|課題|悩|気になる|不便|問題|どうです|いかが/g)||[]).length;
+ const value=(t.match(/できます|メリット|改善|削減|早|安|比較|シミュレーション/g)||[]).length;
+ const next=(t.match(/訪問|アポ|日程|時間|伺|資料|また|次回|何時|いつ/g)||[]).length;
+ const length=Math.max(t.length,1);
+ const qs=Math.min(25,q*6);
+ const ns=Math.min(25,need*6);
+ const vs=Math.min(25,value*5);
+ const xs=Math.min(25,next*6);
+ const total=Math.round(qs+ns+vs+xs);
+ score.textContent=total;
+ metrics.innerHTML=[
+  ['質問',qs],['課題把握',ns],['価値提示',vs],['次アクション',xs]
+ ].map(x=>`<div><b>${x[1]}/25</b><span>${x[0]}</span></div>`).join('');
+ const arr=[['質問',qs],['課題把握',ns],['価値提示',vs],['次アクション',xs]].sort((a,b)=>a[1]-b[1]);
+ advice.textContent=`最も弱いのは「${arr[0][0]}」です。文字起こし上のキーワード出現を基にした簡易診断なので、実際の音声・文脈と合わせて確認してください。`;
+ const tasksMap={
+ '質問':['Yes/No質問を減らし、現状質問を2つ入れる','顧客の回答後に1回深掘りする','質問→回答→要約の型でロープレする'],
+ '課題把握':['「今困っていること」を直接聞く','現状と理想の差を1つ言語化する','顧客の言葉を要約して返す'],
+ '価値提示':['機能ではなく顧客側の変化で伝える','数字・時間・手間のどれかで価値を表現する','課題に紐づけて1つだけ提案する'],
+ '次アクション':['最後に具体的な日時を聞く','「資料送付」で終わらず確認日を決める','次回の目的を一文で合意する']
+ };
+ tasks.innerHTML=tasksMap[arr[0][0]].map(x=>`<li>${x}</li>`).join('');
+ result.classList.add('show');
+ if(window.BETS_TRACK) window.BETS_TRACK('result_view',{label:arr[0][0]});
+}
+</script>
 <footer><div>WORKKIT — practical tools for better work.</div></footer>
 </div>
 <script src="tracking.js"></script></body></html>

@@ -1,5 +1,5 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WORKKIT — 仕事を前に進める無料ツール</title><meta name="description" content="営業・マネジメント・AI活用を中心に、仕事の判断を速くする実用無料ツール。"><style>
+<title>営業KPIボトルネック診断 | WORKKIT</title><style>
 :root{
   --bg:#07101d;--panel:#0d1726;--panel2:#111d2e;--line:rgba(255,255,255,.09);
   --text:#f7f9fc;--muted:#98a5b7;--soft:#c7d0db;--accent:#fff;
@@ -75,37 +75,70 @@ textarea{min-height:120px;resize:vertical}
 @media(max-width:900px){.grid{grid-template-columns:1fr 1fr}.tool-layout{grid-template-columns:1fr}.row4{grid-template-columns:1fr 1fr}}
 @media(max-width:620px){.grid{grid-template-columns:1fr}.row,.row4{grid-template-columns:1fr}.nav{display:none}.hero{padding-top:45px}}
 </style></head>
-<body data-bet="home">
+<body data-bet="001">
 <div class="shell">
 <header>
 <a class="brand" href="index.html"><span class="logo"></span><span>WORKKIT</span></a>
 <nav class="nav"><a href="index.html#live">無料ツール</a><a href="index.html#soon">Coming soon</a></nav>
 </header>
 
-<section class="hero">
-<span class="tag">FREE TOOLS FOR BETTER WORK</span>
-<h1>仕事を、<br>もっと前へ。</h1>
-<p>数字を入れる。結果が返る。次に何をすべきかまで分かる。営業・マネジメントの実務で使える無料ツールを、少しずつ増やしています。</p>
-</section>
-<section class="section" id="live">
-<div class="section-head"><div><span class="eyebrow">LIVE NOW</span><h2>今すぐ使える</h2></div><div class="small">登録不要 / 無料</div></div>
-<div class="grid">
-<a class="card" href="kpi-diagnosis.html"><span class="pill">営業・KPI</span><h3>営業KPIボトルネック診断</h3><p>架電→接続→有効会話→アポを分解。弱い箇所と明日の改善アクションを返します。</p><div class="meta">約30秒 →</div></a>
-<a class="card" href="call-feedback.html"><span class="pill">通話・品質</span><h3>通話ログフィードバック</h3><p>文字起こしを貼るだけ。質問量・次アクション・ヒアリングの弱点をルール診断します。</p><div class="meta">約1分 →</div></a>
-<a class="card" href="script-builder.html"><span class="pill">営業トーク</span><h3>営業スクリプト設計</h3><p>商材・顧客・価値を入れると、導入からクロージングまでの骨子を生成します。</p><div class="meta">約1分 →</div></a>
-<a class="card" href="recall-priority.html"><span class="pill">再コール</span><h3>再コール優先順位診断</h3><p>見込み度・最終接触日・約束有無から、今日かける順番をスコアリングします。</p><div class="meta">約1分 →</div></a>
-<a class="card" href="forecast-gap.html"><span class="pill">予実管理</span><h3>営業予実ギャップ診断</h3><p>目標・現在地・経過日数から月末着地と必要ペースを逆算します。</p><div class="meta">約30秒 →</div></a>
+<section class="tool-hero"><span class="pill">営業・KPI</span><h1>営業KPIボトルネック診断</h1>
+<p class="small">数字を入れると、どのファネルが弱いか・次に何を直すべきかを返します。基準値はチーム事情に合わせて変更できます。</p></section>
+<div class="tool-layout">
+<div class="panel">
+<h2>実績を入力</h2>
+<div class="row4">
+<div class="field"><label>架電数</label><input id="calls" type="number" value="250"></div>
+<div class="field"><label>接続数</label><input id="connected" type="number" value="100"></div>
+<div class="field"><label>有効会話数</label><input id="effective" type="number" value="20"></div>
+<div class="field"><label>アポ数</label><input id="apps" type="number" value="4"></div>
 </div>
-</section>
-<section class="section" id="soon">
-<div class="section-head"><div><span class="eyebrow">COMING SOON</span><h2>次に追加予定</h2></div></div>
-<div class="grid">
-<div class="card"><span class="pill">AI</span><h3>営業録音AI分析</h3><p>文字起こしから、ヒアリング・切り返し・クロージングを詳細分析。</p></div>
-<div class="card"><span class="pill">1on1</span><h3>営業1on1コーチ</h3><p>KPIから質問・課題・次回確認ポイントを生成。</p></div>
-<div class="card"><span class="pill">研修</span><h3>新人営業研修ビルダー</h3><p>役割・商材・日数から研修計画を作成。</p></div>
+<h2 style="margin-top:28px">基準値（任意変更）</h2>
+<div class="row">
+<div class="field"><label>接続率 基準 %</label><input id="b1" type="number" value="40"></div>
+<div class="field"><label>接続→有効 基準 %</label><input id="b2" type="number" value="20"></div>
+<div class="field"><label>有効→アポ 基準 %</label><input id="b3" type="number" value="15"></div>
+<div class="field"><label>架電→アポ 基準 %</label><input id="b4" type="number" value="1.2"></div>
 </div>
-</section>
-
+<button class="btn" id="run">診断する</button>
+<p class="small">※ 基準値は商材・リスト・チャネルで変わります。自社基準がある場合は置き換えてください。</p>
+</div>
+<div class="panel result" id="result">
+<span class="eyebrow">RESULT</span><div class="score" id="headline"></div>
+<div class="kpi" id="kpis"></div>
+<div class="callout"><strong id="reasonTitle"></strong><div id="reason"></div></div>
+<div class="actions"><strong>明日やること</strong><ol id="actions"></ol></div>
+<div class="related"><a href="script-builder.html">営業スクリプト設計 →</a><a href="call-feedback.html">通話ログ診断 →</a></div>
+</div>
+</div>
+<script>
+function pct(a,b){return b? a/b*100:0}
+document.getElementById('run').onclick=()=>{
+ if(window.BETS_TRACK) window.BETS_TRACK('tool_start',{label:'kpi_diagnosis'});
+ const vals={
+  '接続率':[pct(+connected.value,+calls.value),+b1.value],
+  '接続→有効':[pct(+effective.value,+connected.value),+b2.value],
+  '有効→アポ':[pct(+apps.value,+effective.value),+b3.value],
+  '架電→アポ':[pct(+apps.value,+calls.value),+b4.value]
+ };
+ const ranked=Object.entries(vals).map(([k,[v,b]])=>[k,v,b,b? v/b:0]).sort((a,b)=>a[3]-b[3]);
+ const worst=ranked[0];
+ headline.textContent=worst[0];
+ kpis.innerHTML=ranked.map(x=>`<div><b>${x[1].toFixed(1)}%</b><span>${x[0]} / 基準 ${x[2].toFixed(1)}%</span></div>`).join('');
+ const recipes={
+  '接続率':['リスト品質・架電時間帯・再架電設計を確認','時間帯別の接続率を集計する','高接続リストの共通点を確認する','不在先の再架電ルールを統一する'],
+  '接続→有効':['冒頭30秒の価値訴求と質問設計を確認','録音3本で離脱タイミングを見る','冒頭トークを15秒短くする','最初の質問を1つに絞る'],
+  '有効→アポ':['クロージング・切り返し・次アクション設計を確認','断り理由を3分類する','クロージング文言を統一する','競合別カウンタートークを1つ追加する'],
+  '架電→アポ':['上流から順にボトルネックを確認','接続率から順に数字を見る','最弱ファネルを1つだけ改善する','翌日同じ指標で再検証する']
+ };
+ const r=recipes[worst[0]];
+ reasonTitle.textContent='最優先：'+r[0];
+ reason.textContent=`現在 ${worst[1].toFixed(1)}% / 基準 ${worst[2].toFixed(1)}%。基準比 ${(worst[3]*100).toFixed(0)}% です。`;
+ actions.innerHTML=r.slice(1).map(x=>`<li>${x}</li>`).join('');
+ result.classList.add('show');
+ if(window.BETS_TRACK) window.BETS_TRACK('result_view',{label:worst[0]});
+}
+</script>
 <footer><div>WORKKIT — practical tools for better work.</div></footer>
 </div>
 <script src="tracking.js"></script></body></html>
