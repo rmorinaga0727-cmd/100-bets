@@ -72,8 +72,21 @@ textarea{min-height:120px;resize:vertical}
 .badge-high{color:#7ef1b8}.badge-med{color:#ffd47d}.badge-low{color:#ff9898}
 .related{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 .related a{border:1px solid var(--line);border-radius:999px;padding:7px 10px;color:#aeb9c8;font-size:11px}
-@media(max-width:900px){.grid{grid-template-columns:1fr 1fr}.tool-layout{grid-template-columns:1fr}.row4{grid-template-columns:1fr 1fr}}
-@media(max-width:620px){.grid{grid-template-columns:1fr}.row,.row4{grid-template-columns:1fr}.nav{display:none}.hero{padding-top:45px}}
+@media(max-width:900px){.grid{grid-template-columns:1fr 1fr}.tool-layout{grid-template-columns:1fr}.row4{grid-template-columns:1fr 1fr}
+@media(max-width:620px){.grid{grid-template-columns:1fr}.row,.row4{grid-template-columns:1fr}.nav{display:none}.hero{padding-top:45px}
+
+.utility-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.backlink{color:#c7d0db;font-size:13px;font-weight:700}
+.utility-actions{display:flex;gap:8px}
+.mini-btn{background:transparent;color:#aeb9c8;border:1px solid var(--line);border-radius:9px;padding:7px 10px;font-size:12px;cursor:pointer}
+.mini-btn:hover{color:#fff;border-color:rgba(255,255,255,.22)}
+.result-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.priority{font-size:12px;color:#ffcf7b;letter-spacing:.08em}
+.matrix{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.matrix .m{background:#08111d;border:1px solid var(--line);border-radius:12px;padding:12px}
+.matrix .m b{display:block;margin-bottom:4px}
+.good{color:#7ef1b8}.warn{color:#ffd47d}.bad{color:#ff9898}
+@media(max-width:620px){.matrix{grid-template-columns:1fr}
 </style></head>
 <body data-bet="001">
 <div class="shell">
@@ -81,9 +94,17 @@ textarea{min-height:120px;resize:vertical}
 <a class="brand" href="index.html"><span class="logo"></span><span>WORKKIT</span></a>
 <nav class="nav"><a href="index.html#live">無料ツール</a><a href="index.html#soon">Coming soon</a></nav>
 </header>
+<div class="utility-bar">
+  <a class="backlink" href="index.html">← ツール一覧へ戻る</a>
+  <div class="utility-actions"><button class="mini-btn" onclick="history.back()">前の画面</button></div>
+</div>
 
-<section class="tool-hero"><span class="pill">営業・KPI</span><h1>営業KPIボトルネック診断</h1>
-<p class="small">数字を入れると、どのファネルが弱いか・次に何を直すべきかを返します。基準値はチーム事情に合わせて変更できます。</p></section>
+<section class="tool-hero">
+<span class="pill">営業・KPI</span>
+<h1>営業KPIボトルネック診断</h1>
+<p class="small">架電→接続→有効会話→アポを分解し、最も弱いファネルだけでなく「何が原因候補か」「明日何を変えるか」まで返します。</p>
+</section>
+
 <div class="tool-layout">
 <div class="panel">
 <h2>実績を入力</h2>
@@ -93,52 +114,168 @@ textarea{min-height:120px;resize:vertical}
 <div class="field"><label>有効会話数</label><input id="effective" type="number" value="20"></div>
 <div class="field"><label>アポ数</label><input id="apps" type="number" value="4"></div>
 </div>
-<h2 style="margin-top:28px">基準値（任意変更）</h2>
+
+<h2 style="margin-top:28px">あなたの組織の目標値</h2>
 <div class="row">
-<div class="field"><label>接続率 基準 %</label><input id="b1" type="number" value="40"></div>
-<div class="field"><label>接続→有効 基準 %</label><input id="b2" type="number" value="20"></div>
-<div class="field"><label>有効→アポ 基準 %</label><input id="b3" type="number" value="15"></div>
-<div class="field"><label>架電→アポ 基準 %</label><input id="b4" type="number" value="1.2"></div>
+<div class="field"><label>接続率 目標 %</label><input id="b1" type="number" value="40"></div>
+<div class="field"><label>接続→有効 目標 %</label><input id="b2" type="number" value="20"></div>
+<div class="field"><label>有効→アポ 目標 %</label><input id="b3" type="number" value="15"></div>
+<div class="field"><label>架電→アポ 目標 %</label><input id="b4" type="number" value="1.2"></div>
 </div>
+
+<div class="field" style="margin-top:10px">
+<label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+<input id="saveTargets" type="checkbox" style="width:auto"> この目標値をこのブラウザに保存する
+</label>
+</div>
+<div class="result-toolbar">
 <button class="btn" id="run">診断する</button>
-<p class="small">※ 基準値は商材・リスト・チャネルで変わります。自社基準がある場合は置き換えてください。</p>
+<button class="btn secondary" id="reset">入力をリセット</button>
 </div>
+<p class="small">※ 目標値は組織・商材・リスト・チャネルごとに異なります。あなたの組織の目標値を入力してください。</p>
+</div>
+
 <div class="panel result" id="result">
-<span class="eyebrow">RESULT</span><div class="score" id="headline"></div>
+<span class="eyebrow">RESULT</span>
+<div class="priority">TOP PRIORITY</div>
+<div class="score" id="headline"></div>
+
 <div class="kpi" id="kpis"></div>
-<div class="callout"><strong id="reasonTitle"></strong><div id="reason"></div></div>
-<div class="actions"><strong>明日やること</strong><ol id="actions"></ol></div>
-<div class="related"><a href="script-builder.html">営業スクリプト設計 →</a><a href="call-feedback.html">通話ログ診断 →</a></div>
+
+<div class="callout">
+<strong id="summaryTitle"></strong>
+<div id="summaryText"></div>
+</div>
+
+<div class="matrix" id="matrix"></div>
+
+<div class="actions">
+<strong>明日やること</strong>
+<ol id="actions"></ol>
+</div>
+
+<div class="callout">
+<strong>1on1で確認する質問</strong>
+<div id="questions"></div>
+</div>
+
+<div class="callout">
+<strong>翌日チェックするKPI</strong>
+<div id="verify"></div>
+</div>
+
+<div class="result-toolbar">
+<button class="btn secondary" id="copy">結果をコピー</button>
+<a class="btn secondary" href="script-builder.html">スクリプト設計へ</a>
+<a class="btn secondary" href="call-feedback.html">通話ログ診断へ</a>
 </div>
 </div>
-<script>
-function pct(a,b){return b? a/b*100:0}
-document.getElementById('run').onclick=()=>{
- if(window.BETS_TRACK) window.BETS_TRACK('tool_start',{label:'kpi_diagnosis'});
- const vals={
-  '接続率':[pct(+connected.value,+calls.value),+b1.value],
-  '接続→有効':[pct(+effective.value,+connected.value),+b2.value],
-  '有効→アポ':[pct(+apps.value,+effective.value),+b3.value],
-  '架電→アポ':[pct(+apps.value,+calls.value),+b4.value]
- };
- const ranked=Object.entries(vals).map(([k,[v,b]])=>[k,v,b,b? v/b:0]).sort((a,b)=>a[3]-b[3]);
- const worst=ranked[0];
- headline.textContent=worst[0];
- kpis.innerHTML=ranked.map(x=>`<div><b>${x[1].toFixed(1)}%</b><span>${x[0]} / 基準 ${x[2].toFixed(1)}%</span></div>`).join('');
- const recipes={
-  '接続率':['リスト品質・架電時間帯・再架電設計を確認','時間帯別の接続率を集計する','高接続リストの共通点を確認する','不在先の再架電ルールを統一する'],
-  '接続→有効':['冒頭30秒の価値訴求と質問設計を確認','録音3本で離脱タイミングを見る','冒頭トークを15秒短くする','最初の質問を1つに絞る'],
-  '有効→アポ':['クロージング・切り返し・次アクション設計を確認','断り理由を3分類する','クロージング文言を統一する','競合別カウンタートークを1つ追加する'],
-  '架電→アポ':['上流から順にボトルネックを確認','接続率から順に数字を見る','最弱ファネルを1つだけ改善する','翌日同じ指標で再検証する']
- };
- const r=recipes[worst[0]];
- reasonTitle.textContent='最優先：'+r[0];
- reason.textContent=`現在 ${worst[1].toFixed(1)}% / 基準 ${worst[2].toFixed(1)}%。基準比 ${(worst[3]*100).toFixed(0)}% です。`;
- actions.innerHTML=r.slice(1).map(x=>`<li>${x}</li>`).join('');
- result.classList.add('show');
- if(window.BETS_TRACK) window.BETS_TRACK('result_view',{label:worst[0]});
-}
-</script>
+</div>
+
 <footer><div>WORKKIT — practical tools for better work.</div></footer>
 </div>
-<script src="tracking.js"></script></body></html>
+
+<script src="tracking.js"></script>
+<script>
+function pct(a,b){return b? a/b*100:0}
+function cls(r){return r>=1?'good':r>=.8?'warn':'bad'}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+
+const defaults={calls:250,connected:100,effective:20,apps:4,b1:40,b2:20,b3:15,b4:1.2};
+
+const playbook={
+ '接続率':{
+   causes:['架電時間帯が悪い','リスト品質が低い','再架電ルールが弱い'],
+   actions:['時間帯別の接続率を出す','接続率が高いリストの共通点を確認する','不在先の再架電ルールを固定する'],
+   questions:['どの時間帯が最も接続していますか？','不在先は何回・何日後に再架電していますか？','リスト別で接続率に差はありますか？'],
+   verify:'接続率。翌日は同じ架電数でも接続数が増えたかを見る。'
+ },
+ '接続→有効':{
+   causes:['冒頭トークが長い','最初の質問が弱い','価値訴求が顧客課題とズレている'],
+   actions:['離脱した録音を3本だけ確認する','冒頭トークを15秒以内に圧縮する','最初の質問を1つに固定する'],
+   questions:['顧客が離脱するのは何秒目が多いですか？','最初の質問は毎回同じですか？','商材説明より顧客状況確認が先になっていますか？'],
+   verify:'接続→有効率。録音改善後に「会話が続いた割合」が上がったかを見る。'
+ },
+ '有効→アポ':{
+   causes:['クロージングが弱い','競合利用時の切り返し不足','アポ打診のタイミングが遅い'],
+   actions:['断り理由を3分類する','クロージング文言を1つに統一する','競合別カウンタートークを1つだけ追加する'],
+   questions:['一番多い断り理由は何ですか？','アポ打診文言はチームで統一されていますか？','競合利用者に何を確認してから提案していますか？'],
+   verify:'有効→アポ率。断り分類ごとのアポ化率も取れるなら併記する。'
+ },
+ '架電→アポ':{
+   causes:['複数ファネルが同時に弱い','日次行動量が不足','一部メンバーへ成果が偏っている'],
+   actions:['上流から順に1つずつ分解する','個人別KPIを比較する','翌日は最弱ファネル1つだけ改善する'],
+   questions:['誰が平均を押し下げていますか？','行動量と転換率のどちらが原因ですか？','昨日と今日で変えた施策は何ですか？'],
+   verify:'架電→アポ率。ただし改善判断は上流KPIとセットで見る。'
+ }
+};
+
+document.getElementById('run').onclick=()=>{
+ const a=+calls.value,c=+connected.value,e=+effective.value,p=+apps.value;
+ if(a<=0||c<0||e<0||p<0||c>a||e>c||p>e){
+   alert('数値の関係を確認してください。接続≤架電、有効≤接続、アポ≤有効です。');return;
+ }
+ if(window.BETS_TRACK) window.BETS_TRACK('tool_start',{label:'kpi_diagnosis_v08'});
+
+ const vals={
+  '接続率':[pct(c,a),+b1.value],
+  '接続→有効':[pct(e,c),+b2.value],
+  '有効→アポ':[pct(p,e),+b3.value],
+  '架電→アポ':[pct(p,a),+b4.value]
+ };
+ const ranked=Object.entries(vals).map(([k,[v,b]])=>({name:k,value:v,base:b,ratio:b?v/b:0})).sort((x,y)=>x.ratio-y.ratio);
+ const worst=ranked[0];
+ const second=ranked[1];
+ const pb=playbook[worst.name];
+
+ headline.textContent=worst.name;
+
+ kpis.innerHTML=ranked.map(x=>`<div><b class="${cls(x.ratio)}">${x.value.toFixed(1)}%</b><span>${x.name} / 基準 ${x.base.toFixed(1)}%</span></div>`).join('');
+
+ let severity = worst.ratio < .6 ? '大きなボトルネック' : worst.ratio < .8 ? '要改善' : worst.ratio < 1 ? '軽度の改善余地' : '目標以上';
+ summaryTitle.textContent=severity;
+ summaryText.textContent=`最も弱いのは「${worst.name}」。現在 ${worst.value.toFixed(1)}% / 基準 ${worst.base.toFixed(1)}%（基準比 ${(worst.ratio*100).toFixed(0)}%）。次に弱いのは「${second.name}」です。`;
+
+ matrix.innerHTML=`
+  <div class="m"><b>原因候補 1</b>${esc(pb.causes[0])}</div>
+  <div class="m"><b>原因候補 2</b>${esc(pb.causes[1])}</div>
+  <div class="m"><b>原因候補 3</b>${esc(pb.causes[2])}</div>
+  <div class="m"><b>優先順位</b>まず「${esc(worst.name)}」だけを1日改善し、他の変数はなるべく変えない。</div>`;
+
+ actions.innerHTML=pb.actions.map(x=>`<li>${esc(x)}</li>`).join('');
+ questions.innerHTML=pb.questions.map((x,i)=>`${i+1}. ${esc(x)}`).join('<br>');
+ verify.textContent=pb.verify;
+
+ result.classList.add('show');
+ if(window.BETS_TRACK) window.BETS_TRACK('result_view',{label:worst.name});
+ result.scrollIntoView({behavior:'smooth',block:'start'});
+};
+
+document.getElementById('reset').onclick=()=>{
+ ['calls','connected','effective','apps'].forEach(k=>document.getElementById(k).value=defaults[k]);
+ if(!saveTargets.checked){
+   ['b1','b2','b3','b4'].forEach(k=>document.getElementById(k).value=defaults[k]);
+ }
+ result.classList.remove('show');
+ window.scrollTo({top:0,behavior:'smooth'});
+};
+
+document.getElementById('copy').onclick=async()=>{
+ const text=`営業KPI診断
+最優先：${headline.textContent}
+${summaryText.textContent}
+
+明日やること
+${[...actions.querySelectorAll('li')].map((x,i)=>`${i+1}. ${x.textContent}`).join('\n')}
+
+1on1質問
+${questions.innerText}
+
+翌日確認
+${verify.innerText}`;
+ await navigator.clipboard.writeText(text);
+ copy.textContent='コピーしました';
+ setTimeout(()=>copy.textContent='結果をコピー',1200);
+};
+</script>
+</body></html>
